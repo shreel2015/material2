@@ -8,6 +8,9 @@
                       [(ngModel)]="item"
                       required
                       (change)="change($event)"
+                      (selectedItemChange)="selectedItemChange($event)"
+                      minlength="4"
+                      noAsterisk
                       placeholder="Select city">
     </md2-autocomplete>
   </div>

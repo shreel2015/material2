@@ -18,4 +18,7 @@ export class AutocompleteDemo {
   private change(value: any) {
     console.log('Changed data: ', value);
   }
+  private selectedItemChange(value: any) {
+    console.log('Item Changed');
+  }
 }

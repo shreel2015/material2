@@ -66,6 +66,7 @@ export class Md2Autocomplete implements AfterContentInit, ControlValueAccessor {
 
   private _changeEmitter: EventEmitter<any> = new EventEmitter<any>();
   private _textChangeEmitter: EventEmitter<any> = new EventEmitter<any>();
+  private _selectedItemChangeEmitter: EventEmitter<any> = new EventEmitter<any>();
 
   @Output('change')
   get onChange(): Observable<any> {
@@ -77,9 +78,15 @@ export class Md2Autocomplete implements AfterContentInit, ControlValueAccessor {
     return this._textChangeEmitter.asObservable();
   }
 
+  @Output('selectedItemChange')
+  get onSelectedItemChange(): Observable<any> {
+    return this._selectedItemChangeEmitter.asObservable();
+  }
+
   private _value: any = '';
   private _readonly: boolean;
   private _required: boolean;
+  private _noAsterisk: boolean;
   private _disabled: boolean = false;
   private _isInitialized: boolean = false;
   private _onTouchedCallback: () => void = noop;
@@ -99,7 +106,7 @@ export class Md2Autocomplete implements AfterContentInit, ControlValueAccessor {
   @Input() placeholder: string = '';
   @Input('item-text') textKey: string = 'text';
   @Input('item-value') valueKey: string = null;
-  @Input('min-length') minLength: number = 1;
+  @Input() minlength: number = null;
 
   @Input()
   get readonly(): boolean { return this._readonly; }
@@ -108,6 +115,10 @@ export class Md2Autocomplete implements AfterContentInit, ControlValueAccessor {
   @Input()
   get required(): boolean { return this._required; }
   set required(value) { this._required = coerceBooleanProperty(value); }
+
+  @Input()
+  get noAsterisk(): boolean { return this._noAsterisk; }
+  set noAsterisk(value) { this._noAsterisk = coerceBooleanProperty(value); }
 
   @Input()
   get disabled(): boolean { return this._disabled; }
@@ -262,6 +273,7 @@ export class Md2Autocomplete implements AfterContentInit, ControlValueAccessor {
     this._value = this.selectedItem ? this.selectedItem.value : this.selectedItem;
     this._onChangeCallback(this._value);
     this._changeEmitter.emit(this._value);
+    this._selectedItemChangeEmitter.emit(this._value);
     this.onFocus();
   }
 
@@ -304,7 +316,7 @@ export class Md2Autocomplete implements AfterContentInit, ControlValueAccessor {
    * @param query
    */
   private updateItems(query: RegExp) {
-    if (this.inputBuffer.length < this.minLength) {
+    if (this.inputBuffer.length < this.minlength) {
       this.list = [];
     }
     else {
