@@ -21,4 +21,7 @@ export class AutocompleteDemo {
   private selectedItemChange(value: any) {
     console.log('Item Changed');
   }
+  private searchTextChange(value: any) {
+    console.log('Text Changed');
+  }
 }

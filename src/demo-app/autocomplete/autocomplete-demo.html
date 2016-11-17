@@ -9,8 +9,14 @@
                       required
                       (change)="change($event)"
                       (selectedItemChange)="selectedItemChange($event)"
-                      minlength="4"
+                      (searchTextChange)="searchTextChange($event)"
+                      minlength="1"
                       noAsterisk
+                      requireMatch
+                      menuclass="Shreel"
+                      autoselect
+                      autofocus
+                      delay="5000"
                       placeholder="Select city">
     </md2-autocomplete>
   </div>

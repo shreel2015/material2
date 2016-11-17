@@ -18,3 +18,4 @@ md2-autocomplete .md2-autocomplete-placeholder.has-value { transform: translate3
 .md2-autocomplete-menu .md2-option.focus { background: #eeeeee; }
 .md2-autocomplete-menu .md2-option .md2-text { width: auto; white-space: nowrap; overflow: hidden; -ms-text-overflow: ellipsis; -o-text-overflow: ellipsis; text-overflow: ellipsis; font-size: 16px; }
 .md2-autocomplete-menu .highlight { color: #757575; }
+.md-require-match { position: absolute; font-size: 12px; color: #f00; padding: 2px;}

@@ -1,5 +1,5 @@
 <div class="md2-autocomplete-wrap" [class.is-focused]="inputFocused || isMenuVisible">
-  <input [(ngModel)]="inputBuffer" type="text" tabs="false" autocomplete="off" [readonly]="readonly" [tabindex]="disabled ? -1 : tabindex" [disabled]="disabled" class="md2-autocomplete-input" (focus)="onInputFocus()" (blur)="onInputBlur()" (keydown)="inputKeydown($event)" (change)="$event.stopPropagation()" />
+  <input [(ngModel)]="inputBuffer" type="text" tabs="false" autocomplete="off" [readonly]="readonly" [tabindex]="disabled ? -1 : tabindex" [disabled]="disabled" class="md2-autocomplete-input" (focus)="onInputFocus()" (blur)="onInputBlur()" (keydown)="inputKeydown($event)" (change)="$event.stopPropagation()" [autofocus]="autofocus" />
   <span class="md2-autocomplete-placeholder" [class.has-value]="inputBuffer">
     {{placeholder}}
     <span class="md2-placeholder-required" *ngIf="required && !noAsterisk">*</span>
@@ -8,8 +8,9 @@
     <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z" />
   </svg>
 </div>
-<ul *ngIf="isMenuVisible" class="md2-autocomplete-menu" (mouseenter)="listEnter()" (mouseleave)="listLeave()">
+<ul *ngIf="isMenuVisible" class="md2-autocomplete-menu {{menuclass}}" (mouseenter)="listEnter()" (mouseleave)="listLeave()">
   <li class="md2-option" *ngFor="let l of list; let i = index;" [class.focus]="focusedOption === i" (click)="select($event, i)">
     <div class="md2-text" [innerHtml]="l.text | highlight:inputBuffer"></div>
   </li>
 </ul>
+<span class="md-require-match" *ngIf="requireMatch && !selectedItem">Require Match</span>

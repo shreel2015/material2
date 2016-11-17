@@ -65,7 +65,7 @@ export class Md2Autocomplete implements AfterContentInit, ControlValueAccessor {
   ngAfterContentInit() { this._isInitialized = true; }
 
   private _changeEmitter: EventEmitter<any> = new EventEmitter<any>();
-  private _textChangeEmitter: EventEmitter<any> = new EventEmitter<any>();
+  private _searchTextChangeEmitter: EventEmitter<any> = new EventEmitter<any>();
   private _selectedItemChangeEmitter: EventEmitter<any> = new EventEmitter<any>();
 
   @Output('change')
@@ -73,9 +73,9 @@ export class Md2Autocomplete implements AfterContentInit, ControlValueAccessor {
     return this._changeEmitter.asObservable();
   }
 
-  @Output('textChange')
-  get onTextChange(): Observable<any> {
-    return this._textChangeEmitter.asObservable();
+  @Output('searchTextChange')
+  get onSearchTextChange(): Observable<any> {
+    return this._searchTextChangeEmitter.asObservable();
   }
 
   @Output('selectedItemChange')
@@ -87,6 +87,9 @@ export class Md2Autocomplete implements AfterContentInit, ControlValueAccessor {
   private _readonly: boolean;
   private _required: boolean;
   private _noAsterisk: boolean;
+  private _requireMatch: boolean;
+  private _autoselect: boolean;
+  private _autofocus: boolean;
   private _disabled: boolean = false;
   private _isInitialized: boolean = false;
   private _onTouchedCallback: () => void = noop;
@@ -95,7 +98,7 @@ export class Md2Autocomplete implements AfterContentInit, ControlValueAccessor {
   private _items: Array<any> = [];
   private list: Array<Item> = [];
 
-  private focusedOption: number = 0;
+  private focusedOption: number = -1;
   private inputBuffer: string = '';
   private selectedItem: Item = null;
   private inputFocused: boolean = false;
@@ -107,6 +110,8 @@ export class Md2Autocomplete implements AfterContentInit, ControlValueAccessor {
   @Input('item-text') textKey: string = 'text';
   @Input('item-value') valueKey: string = null;
   @Input() minlength: number = null;
+  @Input() menuclass: string;
+  @Input() delay: number= 10;
 
   @Input()
   get readonly(): boolean { return this._readonly; }
@@ -119,6 +124,23 @@ export class Md2Autocomplete implements AfterContentInit, ControlValueAccessor {
   @Input()
   get noAsterisk(): boolean { return this._noAsterisk; }
   set noAsterisk(value) { this._noAsterisk = coerceBooleanProperty(value); }
+
+  @Input()
+  get requireMatch(): boolean { return this._requireMatch; }
+  set requireMatch(value) { this._requireMatch = coerceBooleanProperty(value); }
+
+  @Input()
+  get autoselect(): boolean { return this._autoselect; }
+  set autoselect(value) { 
+    this._autoselect = coerceBooleanProperty(value); 
+    if (this._autoselect === true) {
+      this.focusedOption = 0;
+    }
+  }
+
+  @Input()
+  get autofocus(): boolean { return this._autofocus; }
+  set autofocus(value) { this._autofocus = coerceBooleanProperty(value); }
 
   @Input()
   get disabled(): boolean { return this._disabled; }
@@ -205,7 +227,7 @@ export class Md2Autocomplete implements AfterContentInit, ControlValueAccessor {
    */
   private inputKeydown(event: KeyboardEvent) {
       if (this.disabled) { return; }
-      this._textChangeEmitter.emit(this.inputBuffer);
+      this._searchTextChangeEmitter.emit(this.inputBuffer);
     switch (event.keyCode) {
       case TAB: this.listLeave(); break;
       
@@ -237,7 +259,7 @@ export class Md2Autocomplete implements AfterContentInit, ControlValueAccessor {
       default:
         setTimeout(() => {
           this.updateItems(new RegExp(this.inputBuffer, 'ig'));
-        }, 10);
+        }, this.delay);
     }
   }
 
@@ -276,7 +298,7 @@ export class Md2Autocomplete implements AfterContentInit, ControlValueAccessor {
     this._selectedItemChangeEmitter.emit(this._value);
     this.onFocus();
   }
-
+  
   /**
    * component focus listener
    */
@@ -291,7 +313,6 @@ export class Md2Autocomplete implements AfterContentInit, ControlValueAccessor {
   private onInputFocus() {
     this.inputFocused = true;
     this.updateItems(new RegExp(this.inputBuffer, 'ig'));
-    this.focusedOption = 0;
   }
 
   /**
