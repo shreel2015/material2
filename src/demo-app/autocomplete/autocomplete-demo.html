@@ -10,13 +10,21 @@
                       (change)="change($event)"
                       (selectedItemChange)="selectedItemChange($event)"
                       (searchTextChange)="searchTextChange($event)"
-                      minlength="1"
+                      min-length="1"
                       noAsterisk
                       requireMatch
                       menuclass="Shreel"
                       autoselect
                       autofocus
-                      delay="5000"
+                      delay="0"
+                      name="Shreel"
+                      id="Shreel"
+                      minlength="5"
+                      maxlength="10"
+                      escapeoptions="none"
+                      match
+                      matchCaseInsensitive
+                      selItem="Rajkot"
                       placeholder="Select city">
     </md2-autocomplete>
   </div>

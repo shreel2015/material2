@@ -12,7 +12,8 @@ export class AutocompleteDemo {
     { name: 'Delhi', value: '3' },
     { name: 'Chennai', value: '4' },
     { name: 'Mumbai', value: '5' },
-    { name: 'Goa', value: '6' }
+    { name: 'Goa', value: '6' },
+    { name: 'Vadodaraa', value: '7' }
   ];
   private item: any;
   private change(value: any) {

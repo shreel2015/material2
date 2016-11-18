@@ -1,5 +1,5 @@
 <div class="md2-autocomplete-wrap" [class.is-focused]="inputFocused || isMenuVisible">
-  <input [(ngModel)]="inputBuffer" type="text" tabs="false" autocomplete="off" [readonly]="readonly" [tabindex]="disabled ? -1 : tabindex" [disabled]="disabled" class="md2-autocomplete-input" (focus)="onInputFocus()" (blur)="onInputBlur()" (keydown)="inputKeydown($event)" (change)="$event.stopPropagation()" [autofocus]="autofocus" />
+  <input [(ngModel)]="inputBuffer" type="text" tabs="false" autocomplete="off" [readonly]="readonly" [tabindex]="disabled ? -1 : tabindex" [disabled]="disabled" class="md2-autocomplete-input" (focus)="onInputFocus()" (blur)="onInputBlur()" (keydown)="inputKeydown($event)" (change)="$event.stopPropagation()" [autofocus]="autofocus" [attr.name]="name" [id]="id" [minlength]="minlength" [maxlength]="maxlength" />
   <span class="md2-autocomplete-placeholder" [class.has-value]="inputBuffer">
     {{placeholder}}
     <span class="md2-placeholder-required" *ngIf="required && !noAsterisk">*</span>

@@ -15,7 +15,7 @@ import {
 import {NG_VALUE_ACCESSOR, ControlValueAccessor, FormsModule} from '@angular/forms';
 import {CommonModule} from '@angular/common';
 import {HighlightPipe} from './autocomplete-pipe';
-import {coerceBooleanProperty, UP_ARROW, DOWN_ARROW, ENTER, TAB} from '../core';
+import {coerceBooleanProperty, UP_ARROW, DOWN_ARROW, ENTER, TAB, ESCAPE} from '../core';
 import {Observable} from 'rxjs/Observable';
 
 class Item {
@@ -62,7 +62,14 @@ export class Md2Autocomplete implements AfterContentInit, ControlValueAccessor {
 
   constructor(private element: ElementRef) { }
 
-  ngAfterContentInit() { this._isInitialized = true; }
+  ngAfterContentInit() { 
+    this._isInitialized = true;
+  }
+
+  ngAfterViewInit() { 
+    this.inputBuffer=this._selItem;
+
+  }
 
   private _changeEmitter: EventEmitter<any> = new EventEmitter<any>();
   private _searchTextChangeEmitter: EventEmitter<any> = new EventEmitter<any>();
@@ -90,6 +97,9 @@ export class Md2Autocomplete implements AfterContentInit, ControlValueAccessor {
   private _requireMatch: boolean;
   private _autoselect: boolean;
   private _autofocus: boolean;
+  private _match: boolean;
+  private _matchCaseInsensitive: boolean;
+  private _selItem: any = '';
   private _disabled: boolean = false;
   private _isInitialized: boolean = false;
   private _onTouchedCallback: () => void = noop;
@@ -104,14 +114,18 @@ export class Md2Autocomplete implements AfterContentInit, ControlValueAccessor {
   private inputFocused: boolean = false;
   private noBlur: boolean = true;
 
-  @Input() id: string = 'md2-autocomplete-' + (++nextId);
+  @Input() id: string = 'md-autocomplete-' + (++nextId);
   @Input() tabindex: number = 0;
   @Input() placeholder: string = '';
   @Input('item-text') textKey: string = 'text';
   @Input('item-value') valueKey: string = null;
-  @Input() minlength: number = null;
+  @Input('min-length') minLength: number = 1;
   @Input() menuclass: string;
   @Input() delay: number= 10;
+  @Input() name: string;
+  @Input() minlength: number;
+  @Input() maxlength: number;
+  @Input() escapeoptions: string;
 
   @Input()
   get readonly(): boolean { return this._readonly; }
@@ -133,7 +147,7 @@ export class Md2Autocomplete implements AfterContentInit, ControlValueAccessor {
   get autoselect(): boolean { return this._autoselect; }
   set autoselect(value) { 
     this._autoselect = coerceBooleanProperty(value); 
-    if (this._autoselect === true) {
+    if (this._autoselect) {
       this.focusedOption = 0;
     }
   }
@@ -141,6 +155,18 @@ export class Md2Autocomplete implements AfterContentInit, ControlValueAccessor {
   @Input()
   get autofocus(): boolean { return this._autofocus; }
   set autofocus(value) { this._autofocus = coerceBooleanProperty(value); }
+
+  @Input()
+  get match(): boolean { return this._match; }
+  set match(value) { this._match = coerceBooleanProperty(value); }
+
+  @Input()
+  get matchCaseInsensitive(): boolean { return this._matchCaseInsensitive; }
+  set matchCaseInsensitive(value) { this._matchCaseInsensitive = coerceBooleanProperty(value); }
+
+  @Input()
+  get selItem(): any { return this._selItem; }
+  set selItem(value: any) { this._selItem = value; }
 
   @Input()
   get disabled(): boolean { return this._disabled; }
@@ -231,6 +257,14 @@ export class Md2Autocomplete implements AfterContentInit, ControlValueAccessor {
     switch (event.keyCode) {
       case TAB: this.listLeave(); break;
       
+      case ESCAPE:
+        event.stopPropagation();
+        event.preventDefault();
+        if (this.inputBuffer && (this.escapeoptions !== "none")) {
+          this.onClear();
+          this.onInputBlur();
+        }
+        break;
 
       case ENTER:
         event.preventDefault();
@@ -337,7 +371,7 @@ export class Md2Autocomplete implements AfterContentInit, ControlValueAccessor {
    * @param query
    */
   private updateItems(query: RegExp) {
-    if (this.inputBuffer.length < this.minlength) {
+    if (this.inputBuffer.length < this.minLength) {
       this.list = [];
     }
     else {
@@ -345,13 +379,18 @@ export class Md2Autocomplete implements AfterContentInit, ControlValueAccessor {
       if (this.list.length && this.list[0].text !== this.inputBuffer) {
         this.selectedItem = null;
       }
+      if (this._match && this.list.length === 1 && this.list[0].text === this.inputBuffer) {
+        this.selectedItem = this.list[0];
+      }
+      if (this._match && this._matchCaseInsensitive && this.list.length === 1 && this.list[0].text.toLowerCase() === this.inputBuffer.toLowerCase()) {
+        this.selectedItem = this.list[0];
+      }
     }
   }
 
   writeValue(value: any) {
     if (value !== this._value) {
       this._value = value;
-      this.inputBuffer = '';
       if (value) {
         let selItm = this._items.find((i: any) => this.equals(this.valueKey ? i[this.valueKey] : i, value));
         this.selectedItem = new Item(selItm, this.textKey, this.valueKey);
